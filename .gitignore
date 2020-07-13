@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+# 自定义的
+.DS_Store

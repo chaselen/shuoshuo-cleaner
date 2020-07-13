@@ -1,0 +1,22 @@
+{
+  "name": "shuoshuo-cleaner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "pkgWin": "pkg -t win index.js && echo 打包完成",
+    "pkgMac": "pkg -t macos index.js && echo 打包完成"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "chrome-finder": "^1.0.7",
+    "form-data": "^3.0.0",
+    "puppeteer-core": "^5.0.0"
+  },
+  "devDependencies": {
+    "pkg": "^4.4.9"
+  }
+}
