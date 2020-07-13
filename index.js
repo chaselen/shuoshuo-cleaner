@@ -115,7 +115,7 @@ async function deleteSS(qq, tid, qzonetoken, g_tk, cookieStr) {
       cookie: cookieStr,
     },
   });
-  if (res.status == 200 && res.data.indexOf(`"code":0`)) {
+  if (res.status == 200 && res.data.indexOf(`"code":0`) > 0) {
     // console.log(`删除成功`);
   } else {
     throw new Error(`删除失败`);
