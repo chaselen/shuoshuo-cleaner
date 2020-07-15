@@ -4,7 +4,7 @@ QQ 空间说说清理程序
 
 ## 下载程序
 
-从 [Release](https://github.com/chaselen/shuoshuo-cleaner/releases) 中下载
+从 [Release](https://github.com/chaselen/shuoshuo-cleaner/releases) 中下载程序。支持 Windows 与 MacOS
 
 ## 使用方法
 
@@ -14,4 +14,4 @@ QQ 空间说说清理程序
    - [Chromium](https://www.chromium.org)
 2. 运行程序，登录 QQ 空间即可
 
-程序会按说说从新到旧的顺序清理，说说删除后不可恢复，请慎重使用！
+程序会按说说**从新到旧**的顺序清理，说说删除后不可恢复，请慎重使用！

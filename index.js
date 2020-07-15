@@ -3,17 +3,18 @@ const findChrome = require("chrome-finder");
 const axios = require("axios").default;
 const urlib = require("url");
 const FormData = require("form-data");
+require("colors");
 
 // 开始执行任务前等待时间（秒）
 const WAIT_SEC = 10;
 
-console.log("程序已启动，查找Chrome浏览器");
+console.log("程序已启动，正在查找Chrome浏览器".blue);
 const chromePath = findChrome();
 // const chromePath =
 // "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 async function main() {
-  console.info(`启动浏览器：${chromePath}`);
+  console.log(`启动浏览器：${chromePath.bold}`);
   const browser = await puppeteer.launch({
     executablePath: chromePath,
     headless: false,
@@ -34,7 +35,7 @@ async function main() {
     throw new Error(`登录失败`);
   }
   const qq = page.url().split("/").pop();
-  console.log(`登录成功，当前QQ号：${qq}`);
+  console.log(`登录成功，当前QQ号：${qq}`.green);
 
   // 打开我的主页-说说
   await page.evaluate(`document.querySelector('.icon-say').click()`);
@@ -59,7 +60,9 @@ async function main() {
   // const { referer, "user-agent": userAgent } = ssRequest.headers();
 
   // 运行任务前等待
-  console.log(`程序将在${WAIT_SEC}秒后开始删除说说，如需终止请手动关闭程序\n`);
+  console.log(
+    `程序将在${WAIT_SEC}秒后开始删除说说，如需终止请手动关闭程序`.yellow.bold
+  );
   await sleep(WAIT_SEC * 1000);
 
   let url = ssUrl.replace(/format=jsonp/, "format=json");
@@ -77,12 +80,11 @@ async function main() {
       console.log(`没有说说了`);
       break;
     }
-    console.log(`还有${total}条说说`);
-    for (ss of msglist) {
-      const { tid, content } = ss;
+    console.log(`还有${(total + "").bold}条说说`);
+    for ({ tid, content } of msglist) {
       console.log(
         `正在删除第${i}条："${
-          content.length > 15 ? content.slice(0, 15) + ".." : content
+          content.length > 15 ? content.slice(0, 15) + "..." : content
         }."`
       );
       try {
@@ -90,7 +92,7 @@ async function main() {
         i++;
         console.log(`删除成功`);
       } catch (err) {
-        console.log(`删除失败`);
+        console.log(`删除失败`.red);
       }
     }
   }
@@ -136,5 +138,5 @@ function sleep(timeMill) {
 try {
   main();
 } catch (err) {
-  console.error(`发生错误：`, err);
+  console.error(`发生错误：`.red, err);
 }
