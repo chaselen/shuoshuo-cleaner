@@ -4,6 +4,9 @@ const axios = require("axios").default;
 const urlib = require("url");
 const FormData = require("form-data");
 
+// 开始执行任务前等待时间（秒）
+const WAIT_SEC = 10;
+
 console.log("程序已启动，查找Chrome浏览器");
 const chromePath = findChrome();
 // const chromePath =
@@ -54,6 +57,10 @@ async function main() {
   }
   const cookieStr = cookies.map((a) => `${a.name}=${a.value}`).join("; ");
   // const { referer, "user-agent": userAgent } = ssRequest.headers();
+
+  // 运行任务前等待
+  console.log(`程序将在${WAIT_SEC}秒后开始删除说说，如需终止请手动关闭程序\n`);
+  await sleep(WAIT_SEC * 1000);
 
   let url = ssUrl.replace(/format=jsonp/, "format=json");
   url = url.replace(/pos=\d+/, `pos=0`);
