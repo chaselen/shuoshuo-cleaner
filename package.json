@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "pkgWin": "pkg -t win index.js && echo 打包完成",
-    "pkgMac": "pkg -t macos index.js && echo 打包完成"
+    "pkgWin": "pkg -t win index.js --output=shuoshuo-cleaner-windows",
+    "pkgMac": "pkg -t macos index.js --output=shuoshuo-cleaner-macos",
+    "pkgAll": "npm run pkgWin && npm run pkgMac"
   },
   "author": "",
   "license": "ISC",
