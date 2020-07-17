@@ -49,7 +49,7 @@ function _getGTK(cookieStr) {
  * @param {number|string} page 第几页
  * @param {number|string} size 获取多少条，最多40
  */
-async function getList(ssUrl, cookieStr, page = 1, size = 20) {
+async function getList(ssUrl, cookieStr, page = 1, size = 40) {
   size = Math.min(size, 40)
   let url = ssUrl.replace(/format=jsonp/, 'format=json')
   url = url.replace(/pos=\d+/, `pos=${(page - 1) * (size - 0)}`)
