@@ -101,8 +101,9 @@ async function getDeleteSpanSetting() {
   const { value } = await prompts({
     type: 'number',
     name: 'value',
-    message: `${'设置删除间隔（秒）：'.cyan.bold}（默认是${setting_deleteSpan}）`,
-    validate: value => (value && value >= 0 ? true : '请输入大于等于0的数字'.red)
+    message: '设置删除间隔（秒）：'.cyan.bold,
+    initial: setting_deleteSpan,
+    min: 0
   })
   console.log(`设置删除间隔为${value}秒`)
   return value
