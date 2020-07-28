@@ -16,8 +16,8 @@
     "chrome-finder": "^1.0.7",
     "colors": "^1.4.0",
     "form-data": "^3.0.0",
-    "puppeteer-core": "^5.0.0",
-    "readline-sync": "^1.4.10"
+    "prompts": "^2.3.2",
+    "puppeteer-core": "^5.0.0"
   },
   "devDependencies": {
     "pkg": "^4.4.9"

@@ -4,7 +4,7 @@ const urlib = require('url')
 const shuoshuo = require('./shuoshuo')
 const { sleep } = require('./common')
 require('colors')
-const readlineSync = require('readline-sync')
+const prompts = require('prompts')
 
 // 配置项：删除间隔（默认是3）
 let setting_deleteSpan = 3
@@ -60,31 +60,29 @@ async function main() {
   // const { referer, "user-agent": userAgent } = ssRequest.headers();
 
   // 选择清理方式。取消时值为-1
-  const selectIndex = readlineSync.keyInSelect(
-    ['从新到旧清理', '按时间范围清理（需要获取所有说说数据，比较慢）'],
-    '选择一个清理方式：'.cyan.bold,
-    {
-      cancel: '取消'
-    }
-  )
+  const { selectIndex } = await prompts({
+    type: 'select',
+    name: 'selectIndex',
+    message: '选择一个清理方式：'.cyan.bold,
+    choices: [{ title: '从新到旧清理' }, { title: '按时间范围清理（需要获取所有说说数据，比较慢）' }],
+    initial: 0,
+    hint: '使用方向键选择，回车键确认'
+  })
   if (selectIndex == 0) {
     // 从新到旧
-    setting_deleteSpan = getDeleteSpanSetting()
+    setting_deleteSpan = await getDeleteSpanSetting()
     await waitBeforeRun()
     await shuoshuo.cleanByOrder(qq, ssUrl, qzonetoken, g_tk, cookieStr, setting_deleteSpan)
   } else if (selectIndex == 1) {
     // 按时间范围
-    const { startDate, endDate } = getDeleteDateSetting()
-    setting_deleteSpan = getDeleteSpanSetting()
+    const { startDate, endDate } = await getDeleteDateSetting()
+    setting_deleteSpan = await getDeleteSpanSetting()
     await waitBeforeRun()
     await shuoshuo.cleanByDate(qq, ssUrl, qzonetoken, g_tk, cookieStr, startDate, endDate, setting_deleteSpan)
   }
 
   console.log(`任务执行完毕，程序结束`.cyan)
-  readlineSync.question('按回车键退出', {
-    hideEchoBack: true,
-    mask: ''
-  })
+  await sleep(1e8)
   process.exit(0)
 }
 
@@ -99,25 +97,28 @@ async function waitBeforeRun() {
 /**
  * 获取删除间隔设置
  */
-function getDeleteSpanSetting() {
-  let input = readlineSync.questionInt(`${'设置删除间隔（秒）：'.cyan.bold}（默认是${setting_deleteSpan}）`, {
-    defaultInput: setting_deleteSpan,
-    limitMessage: '请输入一个数字'.red
+async function getDeleteSpanSetting() {
+  const { value } = await prompts({
+    type: 'number',
+    name: 'value',
+    message: `${'设置删除间隔（秒）：'.cyan.bold}（默认是${setting_deleteSpan}）`,
+    validate: value => (value && value >= 0 ? true : '请输入大于等于0的数字'.red)
   })
-  if (input < 0) {
-    input = setting_deleteSpan
-  }
-  console.log(`设置删除间隔为${input}秒`)
-  return input
+  console.log(`设置删除间隔为${value}秒`)
+  return value
 }
 
 /**
  * 获取删除时间范围设置
  */
-function getDeleteDateSetting() {
+async function getDeleteDateSetting() {
   let startDate, endDate
   while (true) {
-    let input = readlineSync.question(`${'输入要删除说说的时间范围：'.cyan.bold}（例：2020-07-01~2020-07-15）`)
+    let { input } = await prompts({
+      type: 'text',
+      name: 'input',
+      message: `${'输入要删除说说的时间范围：'.cyan.bold}（例：2020-07-01~2020-07-15）`
+    })
     input = input.trim()
     if (!input) {
       continue
