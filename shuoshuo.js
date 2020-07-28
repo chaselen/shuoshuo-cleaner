@@ -124,8 +124,9 @@ async function deleteOne(qq, tid, qzonetoken, g_tk, cookieStr) {
  * @param {string} qzonetoken QQ空间token
  * @param {string} g_tk g_tk参数
  * @param {string} cookieStr cookie字符串
+ * @param {number} deleteSpan 删除间隔
  */
-async function cleanByOrder(qq, ssUrl, qzonetoken, g_tk, cookieStr) {
+async function cleanByOrder(qq, ssUrl, qzonetoken, g_tk, cookieStr, deleteSpan = 0) {
   // 开始任务
   while (true) {
     try {
@@ -150,9 +151,12 @@ async function cleanByOrder(qq, ssUrl, qzonetoken, g_tk, cookieStr) {
         console.log(`正在删除第${i}条："${content.length > 15 ? content.slice(0, 15) + '...' : content}"`)
         const { code, message } = await deleteOne(qq, tid, qzonetoken, g_tk, cookieStr)
         if (code == 0) {
-          console.log(`删除成功`.green)
+          console.log(`删除成功${deleteSpan > 0 ? `，等待${deleteSpan}秒` : ''}`.green)
           msglist.shift()
           i++
+          if (deleteSpan > 0 && msglist.length > 0) {
+            await sleep(deleteSpan * 1000)
+          }
         } else {
           if (code == -3001) {
             console.log('删除失败：需要验证码'.red)
@@ -184,8 +188,9 @@ async function cleanByOrder(qq, ssUrl, qzonetoken, g_tk, cookieStr) {
  * @param {string} cookieStr cookie字符串
  * @param {Date} startDate 开始日期
  * @param {Date} endDate 结束日期
+ * @param {number} deleteSpan 删除间隔
  */
-async function cleanByDate(qq, ssUrl, qzonetoken, g_tk, cookieStr, startDate, endDate) {
+async function cleanByDate(qq, ssUrl, qzonetoken, g_tk, cookieStr, startDate, endDate, deleteSpan = 0) {
   // 保证startDate时间在endDate之前
   if (startDate.valueOf() > endDate.valueOf()) {
     const temp = startDate
@@ -196,7 +201,6 @@ async function cleanByDate(qq, ssUrl, qzonetoken, g_tk, cookieStr, startDate, en
   endDate.setHours(23, 59, 59)
   const startTimestamp = startDate.valueOf() / 1000,
     endTimestamp = endDate.valueOf() / 1000
-  console.log(startDate, endDate, startTimestamp, endTimestamp)
 
   const { totalPage, msglist: allMsgList } = await getList(ssUrl, cookieStr, 1)
   console.log(`共有${totalPage}页数据`)
@@ -218,9 +222,12 @@ async function cleanByDate(qq, ssUrl, qzonetoken, g_tk, cookieStr, startDate, en
     console.log(`正在删除第${i}条："${content.length > 15 ? content.slice(0, 15) + '...' : content}"`)
     const { code, message } = await deleteOne(qq, tid, qzonetoken, g_tk, cookieStr)
     if (code == 0) {
-      console.log(`删除成功`.green)
+      console.log(`删除成功${deleteSpan > 0 ? `，等待${deleteSpan}秒` : ''}`.green)
       msglist.shift()
       i++
+      if (deleteSpan > 0 && msglist.length > 0) {
+        await sleep(deleteSpan * 1000)
+      }
     } else {
       if (code == -3001) {
         console.log('删除失败：需要验证码'.red)

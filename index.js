@@ -6,6 +6,9 @@ const { sleep } = require('./common')
 require('colors')
 const readlineSync = require('readline-sync')
 
+// 配置项：删除间隔（默认是3）
+let setting_deleteSpan = 3
+
 // 开始执行任务前等待时间（秒）
 const WAIT_SEC = 10
 
@@ -57,43 +60,28 @@ async function main() {
   // const { referer, "user-agent": userAgent } = ssRequest.headers();
 
   // 选择清理方式。取消时值为-1
-  const selectIndex = readlineSync.keyInSelect(['从新到旧清理', '按时间范围清理（需要获取所有说说数据，稍慢）'])
+  const selectIndex = readlineSync.keyInSelect(
+    ['从新到旧清理', '按时间范围清理（需要获取所有说说数据，比较慢）'],
+    '选择一个清理方式：'.cyan.bold,
+    {
+      cancel: '取消'
+    }
+  )
   if (selectIndex == 0) {
     // 从新到旧
+    setting_deleteSpan = getDeleteSpanSetting()
     await waitBeforeRun()
-    await shuoshuo.cleanByOrder(qq, ssUrl, qzonetoken, g_tk, cookieStr)
+    await shuoshuo.cleanByOrder(qq, ssUrl, qzonetoken, g_tk, cookieStr, setting_deleteSpan)
   } else if (selectIndex == 1) {
     // 按时间范围
-    let startDate, endDate
-    while (true) {
-      let input = readlineSync.question('输入要删除说说的时间范围（例：2020-07-01~2020-07-15）')
-      input = input.trim()
-      if (!input) {
-        continue
-      }
-      if (!/\d{4}-\d{1,2}-\d{1,2}~\d{4}-\d{1,2}-\d{1,2}/.test(input)) {
-        console.log('输入格式有误，请重新输入'.red)
-        continue
-      }
-      startDate = new Date(input.split('~')[0])
-      endDate = new Date(input.split('~')[1])
-      if (isNaN(startDate.valueOf())) {
-        console.log(`${startDate}不是一个有效日期`.red)
-        continue
-      }
-      if (isNaN(endDate.valueOf())) {
-        console.log(`${endDate}不是一个有效日期`.red)
-        continue
-      }
-      break
-    }
-
+    const { startDate, endDate } = getDeleteDateSetting()
+    setting_deleteSpan = getDeleteSpanSetting()
     await waitBeforeRun()
-    await shuoshuo.cleanByDate(qq, ssUrl, qzonetoken, g_tk, cookieStr, startDate, endDate)
+    await shuoshuo.cleanByDate(qq, ssUrl, qzonetoken, g_tk, cookieStr, startDate, endDate, setting_deleteSpan)
   }
 
   console.log(`任务执行完毕，程序结束`.cyan)
-  readlineSync.question('按任意键退出', {
+  readlineSync.question('按回车键退出', {
     hideEchoBack: true,
     mask: ''
   })
@@ -106,6 +94,54 @@ async function main() {
 async function waitBeforeRun() {
   console.log(`任务将在${WAIT_SEC}秒后开始执行，如需终止请手动关闭程序`.yellow.bold)
   await sleep(WAIT_SEC * 1000)
+}
+
+/**
+ * 获取删除间隔设置
+ */
+function getDeleteSpanSetting() {
+  let input = readlineSync.questionInt(`${'设置删除间隔（秒）：'.cyan.bold}（默认是${setting_deleteSpan}）`, {
+    defaultInput: setting_deleteSpan,
+    limitMessage: '请输入一个数字'.red
+  })
+  if (input < 0) {
+    input = setting_deleteSpan
+  }
+  console.log(`设置删除间隔为${input}秒`)
+  return input
+}
+
+/**
+ * 获取删除时间范围设置
+ */
+function getDeleteDateSetting() {
+  let startDate, endDate
+  while (true) {
+    let input = readlineSync.question(`${'输入要删除说说的时间范围：'.cyan.bold}（例：2020-07-01~2020-07-15）`)
+    input = input.trim()
+    if (!input) {
+      continue
+    }
+    if (!/\d{4}-\d{1,2}-\d{1,2}~\d{4}-\d{1,2}-\d{1,2}/.test(input)) {
+      console.log('输入格式有误，请重新输入'.red)
+      continue
+    }
+    startDate = new Date(input.split('~')[0])
+    endDate = new Date(input.split('~')[1])
+    if (isNaN(startDate.valueOf())) {
+      console.log(`${startDate}不是一个有效日期`.red)
+      continue
+    }
+    if (isNaN(endDate.valueOf())) {
+      console.log(`${endDate}不是一个有效日期`.red)
+      continue
+    }
+    break
+  }
+  return {
+    startDate,
+    endDate
+  }
 }
 
 main()
