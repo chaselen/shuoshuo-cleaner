@@ -128,6 +128,7 @@ async function deleteOne(qq, tid, qzonetoken, g_tk, cookieStr) {
  */
 async function cleanByOrder(qq, ssUrl, qzonetoken, g_tk, cookieStr, deleteSpan = 0) {
   // 开始任务
+  let i = 1
   while (true) {
     try {
       // 获取说说
@@ -144,7 +145,6 @@ async function cleanByOrder(qq, ssUrl, qzonetoken, g_tk, cookieStr, deleteSpan =
       console.log(`还有${(total + '').bold}条说说`)
 
       // 删除说说
-      let i = 1
       let breakOuterLoop = false // 是否要跳出外层循环
       while (msglist.length > 0) {
         const { tid, content } = msglist[0]
